@@ -1,0 +1,113 @@
+#include <Ultrasonic.h>
+
+Ultrasonic ultrasonic(11,12); // (Trig PIN,Echo PIN)
+
+const int motorE = 5; //velocidade motor A - de 0 a 255
+const int motorD = 6; //velocidade motor B - de 0 a 255 
+const int dirA = 7; //direção do motor A - HIGH ou LOW
+const int dirB = 8; //direção do motor B - HIGH ou LOW
+int sensorESQ = A5; // Porta Analogica 5
+int sensorDIR = A4; // Porta Analogica 3
+int valorSensorESQ = 0; // Variavel para leitura do sensor esquerdo 
+int valorSensorDIR = 0;  //Variavel para leitura so sensor direito
+int count = 0; // contador
+ 
+
+void setup()
+{
+  TCCR0A = _BV(COM0A1) | _BV(COM0B1) | _BV(WGM01) | _BV(WGM00); //configuracao pwm 
+  TCCR0B = _BV(CS00);  //configuracao pwm
+  pinMode(A5, INPUT); // Configuracao A5 para entrada  
+  pinMode(A4, INPUT); // Configuracao A4 para entrada
+  pinMode(A3, INPUT); // Configuracao A4 para entrada
+  pinMode(motorE, OUTPUT); // Definindo Saida Do Motor Como Saida
+  pinMode(motorD, OUTPUT); // Definindo Saida Do Motor Como Saida
+  pinMode(dirA, OUTPUT); //  Definindo Sentido DO MOTOR e configurando Como Saida
+  pinMode(dirB, OUTPUT); //  Definindo Sentido DO MOTOR e configurando Como Saida
+  Serial.begin(9600); //  Configurando Serial Para Comunicacao 
+}
+
+void loop() 
+{
+//  valorSensorESQ = analogRead(sensorESQ); //Leitura do Sensor Esquerdo
+// Serial.println(valorSensorESQ); //Enviando Leitura para Serial
+// Serial.println("Valor do Sensor ESQ: "); //Enviando Leitura para Serial 
+
+/// valorSensorDIR = analogRead(sensorDIR); //Leitura do Sensor Direito
+// Serial.println(valorSensorDIR); //Enviando Leitura para Serial
+// Serial.println("Valor do Sensor DIR: "); //Enviando Leitura para Serial
+ 
+
+ 
+ if(ultrasonic.Ranging(CM) < 11 && count==0) // se sensor estiver proximo a 11
+  {
+   digitalWrite(dirA, LOW); //sentido de rotacao
+        digitalWrite(dirB, LOW); //Sentido de rotacao
+        analogWrite(motorD, 70); //velocidade ESQUERDO
+        analogWrite(motorE, 70); //velocidade
+        delay(700000);
+    for (int i=0; i <=5; i++) //conta 5 vezes
+
+    {
+     
+      delay(5); //delay
+      count=5; //contador
+     }
+     
+        
+  }
+
+  Serial.println(count); //Enviando Leitura para Serial
+  delay(100);
+
+  if(ultrasonic.Ranging(CM) > 20 && count==5) // se sensor estiver longe a mais de 20cm 
+  {
+    
+  delay(8000); //tempo da passagem do obstaculo
+  count=0;    //contador
+      
+     
+     
+        
+  }
+
+
+  
+    if (analogRead (sensorESQ) < 800 & analogRead (sensorDIR) > 800 )  // Lendo Sensor Direito  se ler preto faca a condicao
+      { 
+        digitalWrite(dirA, LOW); //sentido de rotacao
+        analogWrite(motorD,156); //velocidade
+        digitalWrite(dirB, HIGH); //Sentido de rotacao
+        analogWrite(motorE,126); //velocidade(reveRsaO)
+      
+          delay(10); // tempo de espera 10 ms   
+    
+      }
+    
+    if (analogRead (sensorESQ) > 800 & analogRead (sensorDIR) < 800)  // Lendo Sensor Direito  se ler preto faca a condicao
+      {
+        digitalWrite(dirA, HIGH); //sentido de rotacao
+       
+        analogWrite(motorD,132); //velocidade ESQUERDO(REVERSAO)
+         digitalWrite(dirB, LOW); //Sentido de rotacao
+        analogWrite(motorE,147); //velocidade
+          delay(10); // tempo de espera 10 ms   
+      }
+
+
+    
+    if (analogRead (sensorESQ) < 800 & analogRead (sensorDIR) < 800)  // Lendo Sensor Direito  se ler preto faca a condicao
+      {
+        digitalWrite(dirA, HIGH); //sentido de rotacao
+        digitalWrite(dirB, HIGH); //Sentido de rotacao
+        analogWrite(motorD, 135); //velocidade ESQUERDO
+        analogWrite(motorE, 128); //velocidade
+        delay(10); // tempo de espera 10 ms    
+      }
+   
+
+          
+
+ 
+
+ }//FIM VOID Main
